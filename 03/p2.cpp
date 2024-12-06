@@ -6,32 +6,40 @@
 
 int main() {
 	std::string input;
+	std::string line;
 	std::vector<std::string> instructions;
 
-	while (std::getline(std::cin, input)) {
-		input.erase(std::remove(input.begin(), input.end(), '\n'), input.cend());
+	// Remove newlines from input
+	while (std::getline(std::cin, line)) {
+		input += line;
+	}
 
-		int index = 0;
-		while (true) {
-			std::cout << input << std::endl;
+	std::cout << input << std::endl;
 
-			int start = input.find("a", index);
-			int end = input.find("b", start) + 1;
-			if (start == std::string::npos || end == std::string::npos) {
-				break;
-			}
-			index = start+1;
-			input.erase(start, end-start);
+	int index = 0;
+
+	while (true) {
+		int start = input.find("don't()", index);
+		if (start == std::string::npos) {
+			break;
+		}
+		int end = input.find("do()", start);
+		if (end == std::string::npos) {
+			std::fill(input.begin() + start, input.end(), '*');
+			break;
 		}
 
-		std::regex pattern(R"(mul\(\d{1,3},\d{1,3}\))");
-		std::smatch matches;
-		std::string::const_iterator searchStart(input.cbegin());
-
-		while (std::regex_search(searchStart, input.cend(), matches, pattern)) {
-			instructions.push_back(matches[0]);
-			searchStart = matches.suffix().first;
+		for (size_t i = start; i < end; ++i) {
+			input[i] = '*';
 		}
+		index = end + 1;
+	}
+	/*std::cout << input << std::endl;*/
+
+	std::regex pattern(R"(mul\(\d{1,3},\d{1,3}\))");
+
+	for (std::sregex_iterator it(input.begin(), input.end(), pattern), end_it; it != end_it; ++it) {
+		instructions.push_back(it->str());
 	}
 
 	int sum = 0;
@@ -46,11 +54,10 @@ int main() {
 		int first = std::stoi(mul.substr(d1+1, d2-d1));
 		int second = std::stoi(mul.substr(d2+1, d3-d2));
 
+		std::cout << mul << " - " << first << " x " << second << "\t= " << first*second << "\n";
 		sum += first * second;
-
-		/*std::cout << first << " x " << second << "\t= " << first*second << "\n";*/
 	}
-	std::cout << sum << "\n";
+	std::cout << "Sum: " << sum << "\n";
 
 	return 0;
 }
