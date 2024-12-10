@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <vector>
 
 int main() {
 	std::vector<int> list1;
